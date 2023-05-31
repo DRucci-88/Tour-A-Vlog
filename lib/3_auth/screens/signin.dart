@@ -137,7 +137,8 @@ class SignInScreen extends ConsumerWidget {
     ref.read(signInLoadingProvider.notifier).state = true;
     if (validate(context, ref)) {
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        final credential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
