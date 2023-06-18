@@ -1,20 +1,20 @@
 // ignore_for_file: must_be_immutable
 
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tour_a_vlog/1_common/localization/localization_const.dart';
 import 'package:tour_a_vlog/1_common/theme/theme.dart';
 import 'package:tour_a_vlog/1_common/widgets/show_snackbar.dart';
 import 'package:tour_a_vlog/3_auth/controller/auth_screen_controller.dart';
+import 'package:tour_a_vlog/3_auth/controller/user_controller.dart';
 import 'package:tour_a_vlog/3_auth/screens/signup.dart';
 import 'package:tour_a_vlog/4_home_navigation/bottom_navigation.dart';
 
 class SignInScreen extends ConsumerWidget {
   static const routeName = '/sign_in';
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final emailController = TextEditingController();
 
   DateTime? backPressTime;
 
@@ -33,37 +33,45 @@ class SignInScreen extends ConsumerWidget {
           return false;
         }
       },
-      child: Scaffold(
-        backgroundColor: whiteColor,
-        body: ListView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.zero,
-          children: [
-            Stack(
-              children: [
-                imageContainer(size),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: fixPadding * 2),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      heightBox(size.height * 0.1),
-                      welcomeText(context),
-                      heightSpace,
-                      heightSpace,
-                      heightSpace,
-                      signInFields(size, context),
-                      heightSpace,
-                      heightSpace,
-                      height5Space,
-                      bottomContainer(size, isLoading, context, ref),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ],
+      child: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Scaffold(
+          backgroundColor: whiteColor,
+          body: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.zero,
+            children: [
+              Stack(
+                children: [
+                  imageContainer(size),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: fixPadding * 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        heightBox(size.height * 0.1),
+                        welcomeText(context),
+                        heightSpace,
+                        heightSpace,
+                        heightSpace,
+                        signInFields(size, context),
+                        heightSpace,
+                        heightSpace,
+                        height5Space,
+                        bottomContainer(size, isLoading, context, ref),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -123,6 +131,10 @@ class SignInScreen extends ConsumerWidget {
   }
 
   bool validate(context, ref) {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
     if (emailController.text.trim() != '' &&
         passwordController.text.trim() != '') {
       return true;
@@ -133,29 +145,22 @@ class SignInScreen extends ConsumerWidget {
     return false;
   }
 
-  void firebaseSignIn(context, ref) async {
+  void firebaseSignIn(context, WidgetRef ref) async {
     ref.read(signInLoadingProvider.notifier).state = true;
     if (validate(context, ref)) {
-      try {
-        final credential =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-        );
+      final res = await ref.read(userControllerProvider.notifier).loginUser(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+      if (res['success']) {
         ref.read(signInLoadingProvider.notifier).state = false;
+        Navigator.popAndPushNamed(context, BottomNavigationScreen.routeName);
         showSnackBar(context, Icons.done, Colors.greenAccent,
             "Sign In Success.", Colors.greenAccent);
-        Navigator.pushNamed(context, BottomNavigationScreen.routeName);
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          ref.read(signInLoadingProvider.notifier).state = false;
-          showSnackBar(context, Icons.cancel_outlined, Colors.red,
-              "No user found for that email.", Colors.red);
-        } else if (e.code == 'wrong-password') {
-          ref.read(signInLoadingProvider.notifier).state = false;
-          showSnackBar(context, Icons.cancel_outlined, Colors.red,
-              "Wrong password provided for that user.", Colors.red);
-        }
+      } else {
+        ref.read(signInLoadingProvider.notifier).state = false;
+        showSnackBar(context, Icons.cancel_outlined, Colors.red,
+            res["message"].toString(), Colors.red);
       }
     }
   }

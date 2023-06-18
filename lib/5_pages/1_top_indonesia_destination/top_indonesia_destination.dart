@@ -1,24 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:tour_a_vlog/1_common/localization/localization_const.dart';
+import 'package:tour_a_vlog/1_common/models/city_model.dart';
 import 'package:tour_a_vlog/1_common/theme/theme.dart';
 import 'package:tour_a_vlog/5_pages/1_detail/detail.dart';
 
 class TopIndonesiaDestination extends StatelessWidget {
   static const routeName = '/top_indonesia_destination';
-  TopIndonesiaDestination({super.key});
 
-  final topDestination = [
-    {"image": "assets/topindiandestination/tid1.png", "name": "Jakarta"},
-    {"image": "assets/topindiandestination/tid2.png", "name": "Medan"},
-    {"image": "assets/topindiandestination/tid3.png", "name": "Bali"},
-    {"image": "assets/topindiandestination/tid4.png", "name": "Palembang"},
-    {"image": "assets/topindiandestination/tid5.png", "name": "Lampung"},
-    {"image": "assets/topindiandestination/tid6.png", "name": "Pontianak"},
-    {"image": "assets/topindiandestination/tid7.png", "name": "Manado"},
-    {"image": "assets/topindiandestination/tid8.png", "name": "Makassar"},
-    {"image": "assets/topindiandestination/tid9.png", "name": "Ambon"},
-    {"image": "assets/topindiandestination/tid10.png", "name": "NTB"},
-  ];
+  final List<CityModel> cities;
+
+  const TopIndonesiaDestination({super.key, required this.cities});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +29,7 @@ class TopIndonesiaDestination extends StatelessWidget {
         ),
         titleSpacing: 0,
         title: Text(
-          getTranslate(context, 'Top Indonesia destination'),
+          getTranslate(context, 'home.indonesia_destination'),
           style: semibold18white,
         ),
         flexibleSpace: Container(
@@ -60,33 +51,39 @@ class TopIndonesiaDestination extends StatelessWidget {
           crossAxisSpacing: fixPadding * 2,
           childAspectRatio: 1.3,
         ),
-        itemCount: topDestination.length,
+        itemCount: cities.length,
         itemBuilder: (context, index) {
+          if (cities.isEmpty) {
+            return const Center(child: Text('NO DATA'));
+          }
           return GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, DetailScreen.routeName);
+              Navigator.pushNamed(
+                context,
+                DetailScreen.routeName,
+                arguments: cities[index],
+              );
             },
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 image: DecorationImage(
                     fit: BoxFit.cover,
-                    image:
-                        AssetImage(topDestination[index]['image'].toString())),
+                    image: NetworkImage(cities[index].image)),
               ),
               child: Container(
                 padding: const EdgeInsets.only(bottom: fixPadding),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
+                  color: Colors.red,
                   gradient: LinearGradient(
                     colors: [
-                      blackColor.withOpacity(0),
-                      blackColor.withOpacity(0.02),
                       blackColor.withOpacity(0.07),
                       blackColor.withOpacity(0.1),
                       blackColor.withOpacity(0.2),
-                      blackColor.withOpacity(0.5),
+                      blackColor.withOpacity(0.3),
                       blackColor.withOpacity(0.6),
+                      blackColor.withOpacity(0.9),
                     ],
                     begin: Alignment.center,
                     end: Alignment.bottomCenter,
@@ -94,8 +91,10 @@ class TopIndonesiaDestination extends StatelessWidget {
                 ),
                 alignment: Alignment.bottomCenter,
                 child: Text(
-                  topDestination[index]['name'].toString(),
+                  cities[index].title,
                   style: semibold18white,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
                 ),
               ),
             ),

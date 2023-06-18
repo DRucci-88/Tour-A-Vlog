@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:tour_a_vlog/1_common/localization/localization_const.dart';
+import 'package:tour_a_vlog/1_common/models/city_model.dart';
 import 'package:tour_a_vlog/1_common/theme/theme.dart';
 import 'package:tour_a_vlog/1_common/widgets/column_builder.dart';
-import 'package:tour_a_vlog/4_home_navigation/1_home/home.dart';
-import 'package:tour_a_vlog/5_pages/2_flights/flights.dart';
+import 'package:tour_a_vlog/4_home_navigation/2_booking/open_trip.dart';
+import 'package:tour_a_vlog/4_home_navigation/2_booking/private_tour.dart';
+import 'package:tour_a_vlog/4_home_navigation/controller/city_controller.dart';
 import 'package:tour_a_vlog/5_pages/2_holiday_package/holiday_packages.dart';
-import 'package:tour_a_vlog/5_pages/2_hotel/hotel.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BookingScreen extends StatefulWidget {
+class BookingScreen extends ConsumerStatefulWidget {
   static const routeName = '/booking';
 
   const BookingScreen({super.key});
 
   @override
-  State<BookingScreen> createState() => _BookingScreenState();
+  ConsumerState<BookingScreen> createState() => _BookingScreenState();
 }
 
-class _BookingScreenState extends State<BookingScreen> {
-  String selectedCity = cityList[1]['name'].toString();
-
+class _BookingScreenState extends ConsumerState<BookingScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -123,12 +123,17 @@ class _BookingScreenState extends State<BookingScreen> {
                     children: [
                       Expanded(
                         child: categoryContainer(
-                            size,
-                            "assets/notification/Group.png",
-                            getTranslate(context, 'Open Trip'),
-                            const Color(0xffF27D65), () {
-                          Navigator.pushNamed(context, Flights.routeName);
-                        }),
+                          size,
+                          "assets/notification/Group.png",
+                          getTranslate(context, 'open_trip.open_trip'),
+                          const Color(0xffF27D65),
+                          () {
+                            Navigator.pushNamed(
+                              context,
+                              OpenTrip.routeName,
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -143,12 +148,17 @@ class _BookingScreenState extends State<BookingScreen> {
                     children: [
                       Expanded(
                         child: categoryContainer(
-                            size,
-                            "assets/notification/ri_hotel-line.png",
-                            getTranslate(context, 'Private Tour'),
-                            const Color(0xffC76E1D), () {
-                          Navigator.pushNamed(context, HotelScreen.routeName);
-                        }),
+                          size,
+                          "assets/notification/ri_hotel-line.png",
+                          getTranslate(context, 'Private Tour'),
+                          const Color(0xffC76E1D),
+                          () {
+                            Navigator.pushNamed(
+                              context,
+                              PrivateTour.routeName,
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -211,6 +221,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   topImageContainer(Size size, BuildContext context) {
+    final List<CityModel> data = [];
     return Container(
       height: size.height * 0.21,
       width: double.infinity,
@@ -231,7 +242,11 @@ class _BookingScreenState extends State<BookingScreen> {
             heightSpace,
             InkWell(
               onTap: () {
-                selectCityDialog(context, size);
+                selectCityDialog(
+                  context,
+                  size,
+                  data,
+                );
               },
               child: Row(
                 children: [
@@ -242,7 +257,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
                   width5Space,
                   Text(
-                    selectedCity,
+                    ref.watch(selectedCityNameProvider),
                     style: semibold14white,
                   ),
                   const Icon(Icons.keyboard_arrow_down, color: whiteColor)
@@ -262,7 +277,7 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  selectCityDialog(BuildContext context, Size size) {
+  selectCityDialog(context, Size size, List<CityModel> data) {
     return showDialog(
       barrierColor: blackColor.withOpacity(0.3),
       context: context,
@@ -285,15 +300,13 @@ class _BookingScreenState extends State<BookingScreen> {
             content: Padding(
               padding: const EdgeInsets.symmetric(horizontal: fixPadding),
               child: ColumnBuilder(
-                itemCount: cityList.length,
+                itemCount: data.length,
                 itemBuilder: (context, index) {
                   return ListTile(
                     onTap: () {
-                      setState(() {
-                        set(() {
-                          selectedCity = cityList[index]['name'].toString();
-                        });
-                      });
+                      ref
+                          .watch(selectedCityNameProvider.notifier)
+                          .update((state) => data[index].title);
                       Navigator.pop(context);
                     },
                     leading: Container(
@@ -302,7 +315,8 @@ class _BookingScreenState extends State<BookingScreen> {
                       decoration: BoxDecoration(
                         color: whiteColor,
                         shape: BoxShape.circle,
-                        border: selectedCity == cityList[index]['name']
+                        border: ref.watch(selectedCityNameProvider) ==
+                                data[index].title
                             ? Border.all(
                                 color: primaryColor,
                                 width: 8,
@@ -318,7 +332,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     ),
                     minLeadingWidth: 10,
                     title: Text(
-                      cityList[index]['name'].toString(),
+                      data[index].title,
                       style: medium16black,
                     ),
                   );

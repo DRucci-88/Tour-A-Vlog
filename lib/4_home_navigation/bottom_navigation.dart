@@ -1,49 +1,86 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tour_a_vlog/1_common/localization/localization_const.dart';
 import 'package:tour_a_vlog/1_common/theme/theme.dart';
+import 'package:tour_a_vlog/1_common/widgets/error_screen.dart';
+import 'package:tour_a_vlog/3_auth/controller/user_controller.dart';
+import 'package:tour_a_vlog/3_auth/screens/signin.dart';
 import 'package:tour_a_vlog/4_home_navigation/1_home/home.dart';
 import 'package:tour_a_vlog/4_home_navigation/2_booking/booking.dart';
 import 'package:tour_a_vlog/4_home_navigation/3_favorites/favorites.dart';
 import 'package:tour_a_vlog/4_home_navigation/4_profile/profile.dart';
+import 'package:tour_a_vlog/4_home_navigation/controller/bottom_navigation_vm.dart';
 
-class BottomNavigationScreen extends StatefulWidget {
+class BottomNavigationScreen extends ConsumerStatefulWidget {
   static const routeName = '/bottom_navigation';
 
   const BottomNavigationScreen({super.key});
 
   @override
-  State<BottomNavigationScreen> createState() => _BottomNavigationScreenState();
+  ConsumerState<BottomNavigationScreen> createState() =>
+      _BottomNavigationScreenState();
 }
 
-class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
-  int selectedIndex = 0;
-
-  List pages = [
-    const HomeScreen(),
-    const BookingScreen(),
-    const FavoriteScreen(),
-    const ProfileScreen(),
-  ];
-
-  DateTime? backpressTime;
+class _BottomNavigationScreenState
+    extends ConsumerState<BottomNavigationScreen> {
+  DateTime? backPressTime;
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        bool backStatus = onWillPop(context);
-        if (backStatus) {
-          exit(0);
-        } else {
-          return false;
-        }
+    ref.listen(userControllerProvider, (previous, next) {
+      debugPrint('Employee Home Screen - ref listen profileControllerProvider');
+      if (!next.hasValue || next.value == null) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, SignInScreen.routeName, (route) => false);
+        return;
+      }
+    });
+
+    final currentUser = ref.watch(userControllerProvider);
+    debugPrint('Main navigation - build scaffold');
+    return currentUser.when(
+      data: (user) {
+        debugPrint("main navigation = $user");
+        return WillPopScope(
+          onWillPop: () async {
+            bool backStatus = onWillPop(context);
+            if (backStatus) {
+              exit(0);
+            } else {
+              return false;
+            }
+          },
+          child: Scaffold(
+            body: pages(
+              ref.watch(selectedIndexBottomNavigation),
+            ),
+            bottomNavigationBar: bottomNavigationBar(),
+          ),
+        );
       },
-      child: Scaffold(
-        body: pages.elementAt(selectedIndex),
-        bottomNavigationBar: bottomNavigationBar(),
-      ),
+      error: (error, stackTrace) {
+        return const ErrorScreen(text: 'Navigator Screen - Call Developer');
+      },
+      loading: () {
+        return const Center(child: CircularProgressIndicator());
+      },
     );
+  }
+
+  Widget pages(int selectedIndex) {
+    switch (selectedIndex) {
+      case 0:
+        return const HomeScreen();
+      case 1:
+        return const BookingScreen();
+      case 2:
+        return const FavoriteScreen();
+      case 3:
+        return const ProfileScreen();
+      default:
+        return const HomeScreen();
+    }
   }
 
   bottomNavigationBar() {
@@ -63,11 +100,11 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         fontSize: 14,
       ),
       onTap: (index) {
-        setState(() {
-          selectedIndex = index;
-        });
+        ref
+            .read(selectedIndexBottomNavigation.notifier)
+            .update((state) => index);
       },
-      currentIndex: selectedIndex,
+      currentIndex: ref.watch(selectedIndexBottomNavigation),
       items: [
         BottomNavigationBarItem(
           icon: const Icon(Icons.home_rounded),
@@ -150,9 +187,9 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   onWillPop(context) {
     DateTime now = DateTime.now();
 
-    if (backpressTime == null ||
-        now.difference(backpressTime!) > const Duration(seconds: 2)) {
-      backpressTime = now;
+    if (backPressTime == null ||
+        now.difference(backPressTime!) > const Duration(seconds: 2)) {
+      backPressTime = now;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             backgroundColor: blackColor,

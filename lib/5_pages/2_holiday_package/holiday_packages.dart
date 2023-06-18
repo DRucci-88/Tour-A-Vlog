@@ -1,100 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:tour_a_vlog/1_common/localization/localization_const.dart';
 import 'package:tour_a_vlog/1_common/theme/theme.dart';
-import 'package:tour_a_vlog/5_pages/1_packages/packages.dart';
+import 'package:tour_a_vlog/4_home_navigation/2_booking/open_trip.dart';
+import 'package:tour_a_vlog/4_home_navigation/2_booking/private_tour.dart';
+import 'package:tour_a_vlog/4_home_navigation/controller/category_controller.dart';
+import 'package:tour_a_vlog/4_home_navigation/controller/city_controller.dart';
+import 'package:tour_a_vlog/4_home_navigation/controller/tour_controller.dart';
+import 'package:tour_a_vlog/5_pages/1_detail/detail.dart';
+import 'package:tour_a_vlog/5_pages/1_discover_by_categories/discover_by_categories.dart';
+import 'package:tour_a_vlog/5_pages/1_package_detail.dart/package_detail.dart';
+import 'package:tour_a_vlog/5_pages/1_top_indonesia_destination/top_indonesia_destination.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HolidayPackages extends StatelessWidget {
+class HolidayPackages extends ConsumerStatefulWidget {
   static const routeName = '/holiday_packages';
-  HolidayPackages({super.key});
 
-  final discoverByInterest = [
-    {
-      "image": "assets/home/discover1.png",
-      "name": "Beach",
-    },
-    {
-      "image": "assets/home/discover2.png",
-      "name": "Honeymoon",
-    },
-    {
-      "image": "assets/home/discover3.png",
-      "name": "Mountain",
-    },
-    {
-      "image": "assets/home/discover4.png",
-      "name": "Romantic",
-    },
-    {
-      "image": "assets/home/discover5.png",
-      "name": "Attractive",
-    },
-    {
-      "image": "assets/home/discover6.png",
-      "name": "Hill",
-    },
-  ];
+  const HolidayPackages({super.key});
 
-  final hotAndNew = [
-    {
-      "image": "assets/home/latestCollection1.png",
-      "name": "Raja Ampat",
-    },
-    {
-      "image": "assets/home/h&n1.png",
-      "name": "Bali",
-    },
-    {
-      "image": "assets/home/latestCollection2.png",
-      "name": "Surabaya",
-    },
-    {
-      "image": "assets/home/h&n2.png",
-      "name": "Jakarta",
-    },
-  ];
+  @override
+  ConsumerState<HolidayPackages> createState() => _HolidayPackagesState();
+}
 
-  final internationalDestination = [
-    {
-      "image": "assets/home/destination1.png",
-      "name": "Dubai",
-    },
-    {
-      "image": "assets/home/destination2.png",
-      "name": "Tokyo",
-    },
-    {
-      "image": "assets/home/destination3.png",
-      "name": "Hong Kong",
-    },
-    {
-      "image": "assets/home/destination5.png",
-      "name": "Bankok",
-    },
-  ];
-
-  final indonesiaDestination = [
-    {
-      "image": "assets/home/indiandestination1.png",
-      "name": "Surabaya",
-    },
-    {
-      "image": "assets/home/indiandestination2.png",
-      "name": "NTT",
-    },
-    {
-      "image": "assets/home/indiandestination3.png",
-      "name": "Papua",
-    },
-    {
-      "image": "assets/home/indiandestination4.png",
-      "name": "Bandung",
-    },
-    {
-      "image": "assets/home/indiandestination5.png",
-      "name": "Yogyakarta",
-    },
-  ];
-
+class _HolidayPackagesState extends ConsumerState<HolidayPackages> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -126,96 +53,21 @@ class HolidayPackages extends StatelessWidget {
       body: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
-          discoverbyinterestList(size, context),
-          hotAndnewList(size, context),
-          internationalDestinationList(size, context),
-          indianDestinationList(size, context),
+          discoverByCategoriesList(context, size),
           heightSpace,
+          indonesiaDestinationList(context, size),
+          heightSpace,
+          openTripListView(context, size),
+          heightSpace,
+          privateTourListView(context, size),
           heightSpace,
         ],
       ),
     );
   }
 
-  indianDestinationList(Size size, context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: fixPadding * 2, vertical: fixPadding),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(getTranslate(context, 'holiday_package.top_destination'),
-                  style: semibold16black),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: size.height * 0.23,
-          width: double.maxFinite,
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: fixPadding),
-            itemCount: indonesiaDestination.length,
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, Packages.routeName);
-                },
-                child: Container(
-                  width: size.width * 0.4,
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: fixPadding, vertical: fixPadding / 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: AssetImage(
-                            indonesiaDestination[index]['image'].toString())),
-                    boxShadow: [
-                      BoxShadow(
-                        color: grey94Color.withOpacity(0.5),
-                        blurRadius: 5,
-                      )
-                    ],
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.only(bottom: fixPadding / 2),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: LinearGradient(
-                        colors: [
-                          blackColor.withOpacity(0),
-                          blackColor.withOpacity(0.02),
-                          blackColor.withOpacity(0.07),
-                          blackColor.withOpacity(0.1),
-                          blackColor.withOpacity(0.2),
-                          blackColor.withOpacity(0.5),
-                          blackColor.withOpacity(0.6),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                    alignment: Alignment.bottomCenter,
-                    child: Text(
-                      indonesiaDestination[index]['name'].toString(),
-                      style: semibold18white,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        )
-      ],
-    );
-  }
-
-  discoverbyinterestList(Size size, context) {
+  discoverByCategoriesList(context, Size size) {
+    final categories = ref.watch(categoryControllerProvider);
     return Column(
       children: [
         Padding(
@@ -224,157 +76,221 @@ class HolidayPackages extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(getTranslate(context, 'holiday_package.discover_intrest'),
-                  style: semibold16black),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: size.height * 0.14,
-          width: double.maxFinite,
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: fixPadding),
-            itemCount: discoverByInterest.length,
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: fixPadding),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, Packages.routeName);
-                  },
-                  child: Column(
-                    children: [
-                      Container(
-                        height: size.height * 0.09,
-                        width: size.height * 0.09,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: AssetImage(
-                              discoverByInterest[index]['image'].toString(),
-                            ),
-                          ),
-                        ),
-                      ),
-                      height5Space,
-                      Text(
-                        discoverByInterest[index]['name'].toString(),
-                        style: regular14black,
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        )
-      ],
-    );
-  }
-
-  hotAndnewList(Size size, context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: fixPadding * 2,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
               Text(
-                getTranslate(context, 'holiday_package.hot_new'),
-                style: semibold16black,
+                getTranslate(context, 'holiday_package.discover_categories'),
+                style: semibold16white.copyWith(
+                    color: const Color(0xff333333),
+                    fontWeight: FontWeight.w600),
               ),
             ],
           ),
         ),
-        heightSpace,
         SizedBox(
-          height: size.height * 0.29,
-          width: double.maxFinite,
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: fixPadding),
-            itemCount: hotAndNew.length,
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, Packages.routeName);
-                },
-                child: Container(
-                  width: size.width * 0.4,
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: fixPadding, vertical: fixPadding / 2),
-                  decoration: BoxDecoration(
-                    color: whiteColor,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: grey94Color.withOpacity(0.5),
-                        blurRadius: 5,
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(10)),
-                        child: Image.asset(
-                          hotAndNew[index]['image'].toString(),
-                          height: size.height * 0.15,
-                          width: size.width * 0.4,
-                          fit: BoxFit.cover,
+            height: size.height * 0.15,
+            width: double.maxFinite,
+            child: categories.when(
+              data: (data) {
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: fixPadding),
+                  itemCount: data.length < 5 ? data.length : 5,
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    if (data.isEmpty) {
+                      return const Center(child: Text('NO DATA'));
+                    }
+                    return Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: fixPadding),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            DiscoverByCategories.routeName,
+                            arguments: data[index].title,
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: size.height * 0.1,
+                              width: size.height * 0.1,
+                              child: ClipOval(
+                                clipBehavior: Clip.antiAlias,
+                                child: Image.network(
+                                  data[index].image,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (context, child, event) {
+                                    if (event == null) return child;
+                                    return Center(
+                                      child: SizedBox(
+                                        width: 20.0,
+                                        height: 20.0,
+                                        child: CircularProgressIndicator(
+                                          value: event.cumulativeBytesLoaded /
+                                              (event.expectedTotalBytes ?? 1),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, object, stacktrace) {
+                                    return const Center(
+                                      child: SizedBox(
+                                        width: 20.0,
+                                        height: 20.0,
+                                        child: Icon(Icons.image_not_supported),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            height5Space,
+                            Text(
+                              data[index].title,
+                              style: regular16black,
+                            )
+                          ],
                         ),
                       ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: fixPadding / 2, horizontal: fixPadding),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(
-                                hotAndNew[index]['name'].toString(),
-                                overflow: TextOverflow.ellipsis,
-                                style: medium16black,
-                              ),
-                              Text(
-                                getTranslate(
-                                    context, 'holiday_package.staring_from'),
-                                style: medium12grey94,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                "\$1500${getTranslate(context, 'holiday_package.per_person')}",
-                                style: medium14primary,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        )
+                    );
+                  },
+                );
+              },
+              error: (error, stackTrace) {
+                return const Center(child: Text('Error'));
+              },
+              loading: () {
+                return const Center(child: CircularProgressIndicator());
+              },
+            ))
       ],
     );
   }
 
-  internationalDestinationList(Size size, context) {
+  indonesiaDestinationList(context, Size size) {
+    final cities = ref.watch(indonesiaDestinationControllerProvider);
+
+    return cities.when(
+      data: (data) {
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: fixPadding * 2, vertical: fixPadding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      getTranslate(
+                          context, 'holiday_package.indonesia_destination'),
+                      style: semibold16white.copyWith(
+                          color: const Color(0xff333333),
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        TopIndonesiaDestination.routeName,
+                        arguments: data,
+                      );
+                    },
+                    child: Text(
+                      getTranslate(context, 'home.see_all'),
+                      style: medium14primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.23,
+              width: double.maxFinite,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: fixPadding),
+                itemCount: data.length < 5 ? data.length : 5,
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  if (data.isEmpty) {
+                    return const Center(child: Text('NO DATA'));
+                  }
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        DetailScreen.routeName,
+                        arguments: data[index],
+                      );
+                    },
+                    child: Container(
+                      width: size.width * 0.4,
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: fixPadding, vertical: fixPadding / 2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                            data[index].image,
+                          ),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: grey94Color.withOpacity(0.5),
+                            blurRadius: 5,
+                          )
+                        ],
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.only(bottom: fixPadding / 2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: LinearGradient(
+                            colors: [
+                              blackColor.withOpacity(0.07),
+                              blackColor.withOpacity(0.1),
+                              blackColor.withOpacity(0.2),
+                              blackColor.withOpacity(0.3),
+                              blackColor.withOpacity(0.6),
+                              blackColor.withOpacity(0.9),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          data[index].title,
+                          style: semibold18white,
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          ],
+        );
+      },
+      error: (error, stackTrace) {
+        return const Center(child: Text('Error'));
+      },
+      loading: () {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  openTripListView(context, Size size) {
+    final openTripTours = ref.watch(getTourByTypeProvider(type: 'Open Trip'));
     return Column(
       children: [
         Padding(
@@ -383,75 +299,263 @@ class HolidayPackages extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                getTranslate(
-                    context, 'holiday_package.international_deationation'),
-                style: semibold16black,
+              Expanded(
+                child: Text(
+                  getTranslate(context, 'open_trip.open_trip'),
+                  style: semibold16white.copyWith(
+                      color: const Color(0xff333333),
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    OpenTrip.routeName,
+                  );
+                },
+                child: Text(
+                  getTranslate(context, 'home.see_all'),
+                  style: medium14primary,
+                ),
               ),
             ],
           ),
         ),
         SizedBox(
-          height: size.height * 0.23,
+          height: size.width * 0.55,
           width: double.maxFinite,
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: fixPadding),
-            itemCount: internationalDestination.length,
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, Packages.routeName);
-                },
-                child: Container(
-                  width: size.width * 0.4,
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: fixPadding, vertical: fixPadding / 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: AssetImage(internationalDestination[index]
-                                ['image']
-                            .toString())),
-                    boxShadow: [
-                      BoxShadow(
-                        color: grey94Color.withOpacity(0.5),
-                        blurRadius: 5,
-                      )
-                    ],
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.only(bottom: fixPadding / 2),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: LinearGradient(
-                        colors: [
-                          blackColor.withOpacity(0),
-                          blackColor.withOpacity(0.02),
-                          blackColor.withOpacity(0.07),
-                          blackColor.withOpacity(0.1),
-                          blackColor.withOpacity(0.2),
-                          blackColor.withOpacity(0.5),
-                          blackColor.withOpacity(0.6),
+          child: openTripTours.when(
+            data: (data) {
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: fixPadding),
+                itemCount: data.length < 5 ? data.length : 5,
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  if (data.isEmpty) {
+                    return const Center(child: Text('NO DATA'));
+                  }
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        PackageDetail.routeName,
+                        arguments: data[index],
+                      );
+                    },
+                    child: Container(
+                      width: size.width * 0.4,
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: fixPadding, vertical: fixPadding / 2),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: grey94Color.withOpacity(0.5),
+                            blurRadius: 5,
+                          )
                         ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(10)),
+                              child: Image.network(
+                                data[index].image[0],
+                                width: size.width * 0.4,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, event) {
+                                  if (event == null) return child;
+                                  return Center(
+                                    child: SizedBox(
+                                      width: 20.0,
+                                      height: 20.0,
+                                      child: CircularProgressIndicator(
+                                        value: event.cumulativeBytesLoaded /
+                                            (event.expectedTotalBytes ?? 1),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, object, stacktrace) {
+                                  return const Center(
+                                    child: SizedBox(
+                                      width: 20.0,
+                                      height: 20.0,
+                                      child: Icon(Icons.image_not_supported),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: fixPadding / 2,
+                                horizontal: fixPadding),
+                            child: Text(
+                              data[index].title,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              style: medium14black33,
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                    alignment: Alignment.bottomCenter,
-                    child: Text(
-                      internationalDestination[index]['name'].toString(),
-                      style: semibold18white,
-                    ),
-                  ),
-                ),
+                  );
+                },
               );
+            },
+            error: (error, stackTrace) {
+              return const Center(child: Text('Error'));
+            },
+            loading: () {
+              return const Center(child: CircularProgressIndicator());
             },
           ),
         )
+      ],
+    );
+  }
+
+  privateTourListView(context, Size size) {
+    final privateTours = ref.watch(getTourByTypeProvider(type: 'Private Tour'));
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: fixPadding * 2, vertical: fixPadding),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  getTranslate(context, 'private_tour.private_tour'),
+                  style: semibold16white.copyWith(
+                      color: const Color(0xff333333),
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    PrivateTour.routeName,
+                  );
+                },
+                child: Text(
+                  getTranslate(context, 'home.see_all'),
+                  style: medium14primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+            height: size.width * 0.55,
+            width: double.maxFinite,
+            child: privateTours.when(
+              data: (data) {
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: fixPadding),
+                  itemCount: data.length < 5 ? data.length : 5,
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    if (data.isEmpty) {
+                      return const Center(child: Text('NO DATA'));
+                    }
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          PackageDetail.routeName,
+                          arguments: data[index],
+                        );
+                      },
+                      child: Container(
+                        width: size.width * 0.4,
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: fixPadding, vertical: fixPadding / 2),
+                        decoration: BoxDecoration(
+                          color: whiteColor,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: grey94Color.withOpacity(0.5),
+                              blurRadius: 5,
+                            )
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(10)),
+                                child: Image.network(
+                                  data[index].image[0],
+                                  width: size.width * 0.4,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (context, child, event) {
+                                    if (event == null) return child;
+                                    return Center(
+                                      child: SizedBox(
+                                        width: 20.0,
+                                        height: 20.0,
+                                        child: CircularProgressIndicator(
+                                          value: event.cumulativeBytesLoaded /
+                                              (event.expectedTotalBytes ?? 1),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, object, stacktrace) {
+                                    return const Center(
+                                      child: SizedBox(
+                                        width: 20.0,
+                                        height: 20.0,
+                                        child: Icon(Icons.image_not_supported),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: fixPadding / 2,
+                                  horizontal: fixPadding),
+                              child: Text(
+                                data[index].title,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: medium14black33,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+              error: (error, stackTrace) {
+                return const Center(child: Text('Error'));
+              },
+              loading: () {
+                return const Center(child: CircularProgressIndicator());
+              },
+            ))
       ],
     );
   }
